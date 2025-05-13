@@ -1,5 +1,4 @@
 from base64 import urlsafe_b64encode, b64encode, b32encode, b85encode
-import sys
 import argparse
 import binascii
 import hashlib
