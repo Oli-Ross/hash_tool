@@ -19,17 +19,17 @@ encode_funcs = {
 }
 
 pre_transforms = {
+    "": lambda x: x,
+    "strip": str.strip,
     "leadingspace": lambda x: " " + x,
     "trailingspace": lambda x: x + " ",
-    "strip": str.strip,
-    "": lambda x: x,
 }
 
 transforms = {
+    "": lambda x: x,
+    "capital": str.capitalize,
     "lower": str.lower,
     "upper": str.upper,
-    "capital": str.capitalize,
-    "": lambda x: x,
 }
 
 post_transforms = {
@@ -56,19 +56,18 @@ def transform(sentinel) -> Dict[str, str]:
     for pre_transform_name, pre_transform in pre_transforms.items():
         for transform_name, transform in transforms.items():
             for post_transform_name, post_transform in post_transforms.items():
-                transformed_sentinels[
-                    (f"{pre_transform_name}_" if pre_transform_name != "" else "")
-                    + (f"{transform_name}_" if transform_name != "" else "")
-                    + (f"{post_transform_name}_" if post_transform_name != "" else "")
-                ] = post_transform(transform(pre_transform(sentinel)))
-                # TODO: only apply transforms if they change sentinel instead of deduping
-    transformed_sentinels_deduped = {}
-    seen_sentinels = set()
-    for k, v in transformed_sentinels.items():
-        if v not in seen_sentinels:
-            transformed_sentinels_deduped[k] = v
-            seen_sentinels.add(v)
-    return transformed_sentinels_deduped
+                new_sentinel = post_transform(transform(pre_transform(sentinel)))
+                if new_sentinel not in transformed_sentinels.values():
+                    transformed_sentinels[
+                        (f"{pre_transform_name}_" if pre_transform_name != "" else "")
+                        + (f"{transform_name}_" if transform_name != "" else "")
+                        + (
+                            f"{post_transform_name}_"
+                            if post_transform_name != ""
+                            else ""
+                        )
+                    ] = new_sentinel
+    return transformed_sentinels
 
 
 def encode(hashes: Dict) -> Dict[str, str]:
