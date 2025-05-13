@@ -151,6 +151,10 @@ def run(sentinel: str, wanted_hash: Optional[str] = None, quiet=False):
 
     if wanted_hash:
         clean_hits, fuzzy_hits = find_hashes(hashes, wanted_hash)
+        if len(wanted_hash) < 10:
+            fuzzy_hits = []
+            if not quiet:
+                print("Warning: Short hash input provided, skipping fuzzy search.")
         print_matches(
             clean_hits, fuzzy_hits, hashes, wanted_hash, sentinel, quiet=quiet
         )
